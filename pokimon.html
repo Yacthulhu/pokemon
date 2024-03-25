@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon Types</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #F7F7F7;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #FFF;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #E3350D;
+        }
+        select, button {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button {
+            background-color: #E3350D;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #C12F0B;
+        }
+        .pokemon-list {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .pokemon-item {
+            background-color: #FDEDEC;
+            border: 1px solid #E3350D;
+            border-radius: 5px;
+            margin: 5px;
+            padding: 10px 20px;
+            display: inline-block;
+            width: calc(50% - 20px);
+            text-align: left;
+        }
+        .pokemon-image {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        @media (min-width: 576px) {
+            .pokemon-item {
+                width: calc(33.333% - 20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>tipos de pokemon</h1>
+        <select id="type-selector">
+            <option value="">tipos</option>
+        </select>
+        <button id="fetch-button">listar</button>
+        <ul class="pokemon-list" id="pokemon-list"></ul>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // popula o seletor
+            $.get('https://pokeapi.co/api/v2/type/', function(data) {
+                data.results.forEach(function(type) {
+                    $('#type-selector').append(`<option value="${type.url}">${type.name}</option>`);
+                });
+            });
+
+            // lista os pokemon
+            $('#fetch-button').click(function() {
+                var typeUrl = $('#type-selector').val();
+                if (typeUrl) {
+                    $.get(typeUrl, function(data) {
+                        $('#pokemon-list').empty();
+                        data.pokemon.forEach(function(pokemonEntry) {
+                            var pokemonUrl = pokemonEntry.pokemon.url;
+                            $.get(pokemonUrl, function(pokemonData) {
+                                var imageUrl = pokemonData.sprites.front_default;
+                                var name = pokemonData.name;
+                                $('#pokemon-list').append(`<li class="pokemon-item"><img src="${imageUrl}" class="pokemon-image">${name}</li>`);
+                            });
+                        });
+                    });
+                } else {
+                    alert('Please select a type!');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
